@@ -12,13 +12,13 @@ PINECONE_KEY = st.secrets["PINECONE_KEY"]
 genai.configure(api_key=GEMINI_KEY)
 model_gemini = genai.GenerativeModel('gemini-1.5-flash')
 pc = Pinecone(api_key=PINECONE_KEY)
-index = pc.Index("eproc-chamados") # O nome exato que criamos lá no painel
+index = pc.Index("eproc-chamados") 
 
 st.set_page_config(page_title="Eproc AI Support", layout="wide")
 st.title("⚖️ Assistente Inteligente Eproc")
 st.markdown("Base de dados: **Pinecone Vector Database**")
 
-# A mesma função "Cão Farejador" para achar o vetor sem erro
+# Função Cão Farejador
 def cacar_embedding(dados):
     if isinstance(dados, dict):
         if "embedding" in dados and isinstance(dados["embedding"], list): return dados["embedding"]
@@ -48,19 +48,18 @@ if st.button("🔍 Gerar Solução"):
                     st.error("Erro ao gerar vetor na OpenAI.")
                     st.stop()
 
-                # 2. Busca no Pinecone (Substitui o Supabase)
-                # Pede os 3 mais próximos e inclui os metadados (os textos salvos)
+                # 2. Busca no Pinecone (COM A SINTAXE NOVA CORRIGIDA)
                 resultados = index.query(vector=embedding, top_k=3, include_metadata=True)
 
-                if not resultados or "matches" not in resultados or len(resultados["matches"]) == 0:
-                    st.warning("Nenhum chamado similar encontrado. (O Pinecone está vazio?)")
+                if not resultados or not resultados.matches:
+                    st.warning("Nenhum chamado similar encontrado.")
                 else:
                     contexto = ""
                     # 3. Formata os resultados
-                    for r in resultados["matches"]:
-                        metadados = r.get("metadata", {})
-                        cid = metadados.get("id_chamado_original", "N/A")
-                        sol = metadados.get("resposta_limpa", "Sem conteúdo")
+                    for r in resultados.matches:
+                        meta = r.metadata if r.metadata else {}
+                        cid = meta.get("id_chamado_original", "N/A")
+                        sol = meta.get("resposta_limpa", "Sem conteúdo")
                         contexto += f"CHAMADO #{cid}: {sol}\n\n"
 
                     # 4. Gemini gera a resposta
@@ -71,9 +70,10 @@ if st.button("🔍 Gerar Solução"):
                     st.markdown(resposta_final.text)
                     
                     st.divider()
-                    for r in resultados["matches"]:
-                        meta = r.get("metadata", {})
-                        with st.expander(f"Ref: Chamado #{meta.get('id_chamado_original', 'N/A')} (Score: {r.get('score', 0):.2f})"):
+                    for r in resultados.matches:
+                        meta = r.metadata if r.metadata else {}
+                        score = r.score if r.score else 0.0
+                        with st.expander(f"Ref: Chamado #{meta.get('id_chamado_original', 'N/A')} (Score: {score:.2f})"):
                             st.write(meta.get('resposta_limpa'))
 
             except Exception as e:
