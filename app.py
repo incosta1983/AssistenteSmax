@@ -10,7 +10,7 @@ PINECONE_KEY = st.secrets["PINECONE_KEY"]
 
 # Configurações das IAs e Banco
 genai.configure(api_key=GEMINI_KEY)
-model_gemini = genai.GenerativeModel('gemini-1.5-flash-latest')
+model_gemini = genai.GenerativeModel('gemini-pro')
 pc = Pinecone(api_key=PINECONE_KEY)
 index = pc.Index("eproc-chamados") 
 
