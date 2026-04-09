@@ -1,4 +1,4 @@
 streamlit
 httpx
 google-generativeai
-pinecone-client
+pinecone
