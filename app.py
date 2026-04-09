@@ -3,10 +3,11 @@ import httpx
 import google.generativeai as genai
 
 # --- CONFIGURAÇÕES ---
-SUPABASE_URL = "https://sihbkjfagokylmucrhif.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpaGJramZhZ29reWxtdWNyaGlmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTY4NjAzMiwiZXhwIjoyMDkxMjYyMDMyfQ.OHJr7talqRzRFAi1xhziE_7bpcXVNED0J8dKxABh7Uk"
-OPENAI_KEY = "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"
-GEMINI_KEY = "AIzaSyDBhfwHAfqrWmv-UWQNnAdKZ_oI1osnA6Q"
+# --- CONFIGURAÇÕES SEGURAS ---
+SUPABASE_URL = st.secrets["SUPABASE_URL"]
+SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+OPENAI_KEY = st.secrets["OPENAI_KEY"]
+GEMINI_KEY = st.secrets["GEMINI_KEY"]
 
 # Configura o Gemini
 genai.configure(api_key=GEMINI_KEY)
