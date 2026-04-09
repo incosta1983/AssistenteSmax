@@ -71,15 +71,23 @@ if st.button("🔍 Gerar Solução"):
                         contexto += f"CHAMADO #{cid}: {sol}\n\n"
 
                     # 4. OpenAI GPT gera a resposta final
-                    prompt_sistema = "Você é o Assistente de Suporte Eproc. Use os casos abaixo para resolver o problema do usuário de forma clara e educada."
-                    prompt_usuario = f"Casos Históricos:\n{contexto}\nProblema do Usuário: {pergunta}"
+                    # 4. OpenAI GPT gera a resposta final
+                    prompt_sistema = """Você é um redator sênior de Suporte Técnico do sistema Eproc. 
+                    Sua missão é criar um SCRIPT PRONTO, educado e direto ao ponto, para o atendente copiar e colar na resposta ao usuário.
+                    Baseie-se APENAS nas soluções dos chamados históricos fornecidos.
+                    - Comece com uma saudação amigável.
+                    - Use um formato de passo a passo se houver instruções claras.
+                    - Ao final da mensagem, adicione uma linha dizendo: 'Solução baseada nos chamados: [Inserir os IDs dos chamados aqui]'."""
+                    
+                    prompt_usuario = f"Chamados Históricos (Contexto):\n{contexto}\n\nProblema Relatado pelo Usuário: {pergunta}\n\nEscreva o script de resposta final:"
                     
                     payload_chat = {
                         "model": "gpt-4o-mini",
                         "messages": [
                             {"role": "system", "content": prompt_sistema},
                             {"role": "user", "content": prompt_usuario}
-                        ]
+                        ],
+                        "temperature": 0.3 # Deixa a IA mais focada e menos inventiva
                     }
                     
                     res_chat = httpx.post("https://api.openai.com/v1/chat/completions", json=payload_chat, headers=headers_oa, timeout=30.0)
